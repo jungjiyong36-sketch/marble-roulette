@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>말랑 젤리 마블 룰렛 | 40초 컷 파스텔 핀볼 제비뽑기 & 사다리 타기</title>
+  <meta name="description" content="초등학교 교실 발표자 뽑기, 교회 청년부 당번 정하기, 대학생 조별과제 팀플 순서 정하기에 최적화된 감성 파스텔 마블 룰렛 핀볼 게임입니다. 설치 없이 40초 안에 결과를 확인하세요!" />
+
+  <!-- Google Fonts: Jua & Pretendard -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Matter.js 2D Physics Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            jua: ['"Jua"', 'sans-serif'],
+            sans: ['"Pretendard"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            cream: '#FFFDF7',
+            softblue: '#F0F4F8',
+            candypink: '#FF7EB6',
+            mintgreen: '#42D392',
+            butteryellow: '#FFD166',
+            skyblue: '#4EA8DE',
+            lavender: '#B5838D',
+            coral: '#FF928B',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-cream: #FFFDF7;
+      --bg-soft: #F0F4F8;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(255, 126, 182, 0.12) 0%, transparent 35%),
+        radial-gradient(circle at 85% 25%, rgba(78, 168, 222, 0.12) 0%, transparent 35%),
+        radial-gradient(circle at 50% 80%, rgba(66, 211, 146, 0.12) 0%, transparent 40%);
+      color: #334155;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* Claymorphism Card & Button Styles */
+    .clay-card {
+      background: #FFFFFF;
+      border-radius: 1.75rem;
+      border: 3px solid #F1F5F9;
+      box-shadow: 
+        0 14px 28px -6px rgba(148, 163, 184, 0.18),
+        0 4px 10px -2px rgba(148, 163, 184, 0.1),
+        inset 0 -5px 0 0 #F1F5F9;
+    }
+
+    .clay-btn {
+      transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 
+        0 6px 14px -2px rgba(148, 163, 184, 0.28),
+        inset 0 -4px 0 0 rgba(0, 0, 0, 0.12),
+        inset 0 3px 0 0 rgba(255, 255, 255, 0.45);
+    }
+
+    .clay-btn:hover {
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    .clay-btn:active {
+      transform: translateY(2px) scale(0.98);
+      box-shadow: 
+        0 2px 6px -1px rgba(148, 163, 184, 0.2),
+        inset 0 -2px 0 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .clay-pill {
+      box-shadow: 
+        0 4px 10px -2px rgba(148, 163, 184, 0.2),
+        inset 0 -3px 0 0 rgba(0, 0, 0, 0.07),
+        inset 0 2px 0 0 rgba(255, 255, 255, 0.7);
+      transition: all 0.15s ease;
+    }
+
+    .clay-pill:active {
+      transform: translateY(1px);
+    }
+
+    /* AdSense Slot Placeholder Styling */
+    .ad-slot {
+      background: linear-gradient(135deg, #FFF9FB 0%, #F4F9FF 100%);
+      border: 2px dashed #CBD5E1;
+      border-radius: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #94A3B8;
+      margin-top: 22px;
+      margin-bottom: 22px;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F8FAFC;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Floating Animation */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+    .animate-float {
+      animation: floatSlow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulsePop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+    .animate-pulse-pop {
+      animation: pulsePop 0.9s ease-in-out infinite;
+    }
+
+    /* Canvas Container Aspect & Touch Handling */
+    #canvasWrapper {
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-pink-200 selection:text-pink-900">
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-[-16px] transition-all duration-300">
+    <div class="bg-slate-800/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-sm font-medium border border-slate-700">
+      <span id="toastIcon" class="text-lg">✨</span>
+      <span id="toastMessage">알림 메시지</span>
+    </div>
+  </div>
+
+  <!-- Top Navigation & Header -->
+  <header class="max-w-4xl mx-auto px-4 pt-5 pb-2">
+    <div class="flex flex-wrap items-center justify-between gap-3 bg-white/90 backdrop-blur-md px-5 py-3.5 rounded-3xl border-2 border-slate-100 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-candypink via-coral to-butteryellow flex items-center justify-center shadow-md text-2xl animate-float">
+          🍬
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-jua text-xl sm:text-2xl text-slate-800 tracking-wide">말랑 젤리 마블 룰렛</h1>
+            <span class="bg-pink-100 text-pink-600 font-jua text-xs px-2.5 py-0.5 rounded-full">40초 컷!</span>
+          </div>
+          <p class="text-xs text-slate-500">학교 교실 · 교회 모임 · 대학생 팀플 핀볼 사다리 게임</p>
+        </div>
+      </div>
+
+      <!-- Sound & Quick Share Controls -->
+      <div class="flex items-center gap-2">
+        <button id="soundToggleBtn" onclick="toggleMute()" class="clay-pill bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-1.5" title="효과음 켜기/끄기">
+          <span id="soundIcon">🔊</span>
+          <span id="soundLabel" class="hidden sm:inline">효과음 ON</span>
+        </button>
+        <button onclick="shareCurrentSetupUrl()" class="clay-pill bg-sky-100 hover:bg-sky-200 text-sky-700 px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-1.5" title="현재 명단과 맵 설정을 링크로 복사">
+          <span>🔗</span>
+          <span>대진표 링크 복사</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- [AdSense Slot 1] Top Header Banner (Minimum 20px margin from interactive buttons) -->
+    <div class="ad-slot h-20 sm:h-24 w-full" aria-label="Advertisement">
+      <span class="text-[10px] font-bold tracking-widest uppercase bg-slate-200/80 text-slate-500 px-2 py-0.5 rounded mb-1">AD · SPONSORED</span>
+      <p class="text-xs sm:text-sm font-medium text-slate-400">구글 애드센스 상단 반응형 배너 영역 (728x90 / 320x100)</p>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-4xl mx-auto px-4 pb-16">
+
+    <!-- Collapsible Setup Compact Bar (Shown when collapsed during game) -->
+    <div id="compactSetupBar" class="hidden mb-4 clay-card p-3.5 bg-gradient-to-r from-pink-50 via-white to-sky-50 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <span class="text-xl">🎯</span>
+        <div>
+          <p id="compactSummaryText" class="text-xs sm:text-sm font-bold text-slate-700">참가자 10명 · 솜사탕 퐁퐁 맵</p>
+          <p class="text-[11px] text-slate-500">40초 타임어택 물리 엔진 작동 중</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleSetupPanel(true)" class="clay-pill bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
+          <span>⚙️</span>
+          <span>명단/맵 수정</span>
+        </button>
+        <button onclick="restartGame()" class="clay-pill bg-pink-500 hover:bg-pink-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
+          <span>🔄</span>
+          <span>재시작</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Full Setup & Configuration Card -->
+    <section id="setupPanel" class="clay-card p-5 sm:p-6 mb-6 transition-all duration-300">
+      <div class="flex flex-col lg:flex-row gap-6">
+        
+        <!-- Left Column: Participant Input & Smart Presets -->
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center justify-between mb-2.5">
+            <label for="namesInput" class="font-jua text-lg text-slate-800 flex items-center gap-1.5">
+              <span>📝</span>
+              <span>참가자 명단 입력</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <span id="participantCountBadge" class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
+                총 8개 구슬
+              </span>
+              <button onclick="clearParticipants()" class="text-xs text-slate-400 hover:text-rose-500 font-medium underline">
+                초기화
+              </button>
+            </div>
+          </div>
+
+          <!-- Smart Presets Row (School / Church / University) -->
+          <div class="bg-slate-50/90 p-3 rounded-2xl border border-slate-200/80 mb-3">
+            <div class="text-xs font-bold text-slate-500 mb-2 flex items-center justify-between">
+              <span>✨ 원클릭 테마 프리셋 (클릭 시 자동 입력)</span>
+              <span class="text-[11px] font-normal text-slate-400">이름*개수 입력 가능</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <!-- School Attendance Number Preset with Adjuster -->
+              <div class="flex items-center bg-amber-50 border border-amber-200 rounded-xl p-1.5 gap-1">
+                <button onclick="applySchoolNumberPreset()" class="flex-1 text-left px-2 py-1 rounded-lg hover:bg-amber-100/80 transition text-amber-900 font-bold text-xs flex items-center gap-1">
+                  <span>🏫</span>
+                  <span>출석번호 생성</span>
+                </button>
+                <div class="flex items-center bg-white rounded-lg border border-amber-200 px-1.5 py-0.5" title="학생 수 설정 (1번 ~ N번)">
+                  <input id="studentCountInput" type="number" min="2" max="60" value="25" class="w-9 text-center text-xs font-bold text-slate-700 focus:outline-none" onchange="applySchoolNumberPreset()" />
+                  <span class="text-[10px] text-slate-400 font-semibold">명</span>
+                </div>
+              </div>
+
+              <!-- Church / Youth Group Preset -->
+              <button onclick="applyPreset('church')" class="clay-pill bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-800 px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+                <span>⛪</span>
+                <span>모임/교회 당번</span>
+              </button>
+
+              <!-- University / Team Project Preset -->
+              <button onclick="applyPreset('uni')" class="clay-pill bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-800 px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+                <span>🎓</span>
+                <span>대학생/팀플 역할</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Textarea -->
+          <textarea
+            id="namesInput"
+            rows="4"
+            placeholder="이름을 쉼표(,)나 줄바꿈으로 입력하세요.&#10;예: 민수*2, 지영, 현우*3, 수빈 (숫자를 곱하면 구슬 개수가 늘어납니다!)"
+            class="w-full rounded-2xl border-2 border-slate-200 bg-amber-50/20 p-3.5 text-sm text-slate-700 font-medium focus:border-pink-400 focus:bg-white focus:outline-none transition resize-none leading-relaxed"
+            oninput="updateParticipantBadge()"
+          >민수*2, 지영, 현우, 수빈*2, 도윤, 서연, 하은</textarea>
+
+          <p class="text-[11px] text-slate-400 mt-1.5 flex items-center justify-between">
+            <span>💡 팁: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">이름*3</code> 처럼 입력하면 해당 참가자의 구슬이 3개 생성됩니다.</span>
+          </p>
+        </div>
+
+        <!-- Right Column: Map Selection & Winning Mode -->
+        <div class="flex-1 flex flex-col justify-between">
+          <div>
+            <!-- Map Selection (3 Cute Maps) -->
+            <label class="font-jua text-lg text-slate-800 flex items-center gap-1.5 mb-2.5">
+              <span>🗺️</span>
+              <span>테마 맵 선택 (3종)</span>
+            </label>
+
+            <div class="grid grid-cols-3 gap-2.5 mb-4">
+              <!-- Map 1 -->
+              <button type="button" onclick="selectMap(1)" id="mapBtn1" class="map-select-btn clay-pill p-3 rounded-2xl border-2 border-pink-400 bg-pink-50/90 text-left flex flex-col justify-between transition">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xl">🍭</span>
+                  <span class="text-[10px] font-bold bg-pink-200 text-pink-800 px-2 py-0.5 rounded-full">인기</span>
+                </div>
+                <div class="font-jua text-sm text-slate-800 leading-tight">솜사탕 퐁퐁</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">파스텔 핀 + 구름 바운서</div>
+              </button>
+
+              <!-- Map 2 -->
+              <button type="button" onclick="selectMap(2)" id="mapBtn2" class="map-select-btn clay-pill p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-left flex flex-col justify-between transition">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xl">🎡</span>
+                  <span class="text-[10px] font-bold bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">역동적</span>
+                </div>
+                <div class="font-jua text-sm text-slate-800 leading-tight">바람개비 언덕</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">대형 풍차 3개 + 젤리버섯</div>
+              </button>
+
+              <!-- Map 3 -->
+              <button type="button" onclick="selectMap(3)" id="mapBtn3" class="map-select-btn clay-pill p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-left flex flex-col justify-between transition">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xl">⭐</span>
+                  <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">대역전</span>
+                </div>
+                <div class="font-jua text-sm text-slate-800 leading-tight">도키도키 깔때기</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">좁은 미끄럼틀 + 별톱니</div>
+              </button>
+            </div>
+
+            <!-- Winning Mode Selection -->
+            <label class="font-jua text-lg text-slate-800 flex items-center gap-1.5 mb-2">
+              <span>🏆</span>
+              <span>당첨 기준 선택</span>
+            </label>
+
+            <div class="grid grid-cols-2 gap-2.5 mb-5">
+              <button type="button" onclick="selectMode('first')" id="modeBtnFirst" class="clay-pill py-2.5 px-3 rounded-2xl border-2 border-emerald-400 bg-emerald-50 text-emerald-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-2">
+                <span class="text-base">🥇</span>
+                <span>가장 먼저 도착 (1등)</span>
+              </button>
+              <button type="button" onclick="selectMode('last')" id="modeBtnLast" class="clay-pill py-2.5 px-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 font-bold text-xs sm:text-sm flex items-center justify-center gap-2">
+                <span class="text-base">🐢</span>
+                <span>가장 늦게 도착 (꼴찌)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Start Game CTA Button -->
+          <button
+            type="button"
+            onclick="startGame()"
+            class="clay-btn w-full py-4 rounded-2xl bg-gradient-to-r from-candypink via-coral to-butteryellow text-white font-jua text-xl sm:text-2xl tracking-wide flex items-center justify-center gap-2 shadow-lg"
+          >
+            <span>🚀</span>
+            <span>젤리 구슬 출발하기! (게임 시작)</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Game Stage & Canvas Wrapper -->
+    <section id="gameStageSection" class="relative">
+      <div class="clay-card p-3 sm:p-4 bg-white relative overflow-hidden">
+
+        <!-- Top HUD Bar inside Game Card -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-2 border-b border-slate-100">
+          <!-- Left: Elapsed Timer & Gravity Phase Badge -->
+          <div class="flex items-center gap-2">
+            <div class="bg-slate-800 text-white px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 font-mono text-xs sm:text-sm font-bold shadow-sm">
+              <span>⏱️</span>
+              <span id="timerDisplay">00.0초</span>
+            </div>
+            <div id="speedPhaseBadge" class="bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1 transition-all">
+              <span>🎈</span>
+              <span id="speedPhaseText">통통 기본 중력 (1.0x)</span>
+            </div>
+          </div>
+
+          <!-- Right: Camera View Toggle & Live Target Broadcast Badge -->
+          <div class="flex items-center gap-2">
+            <div id="targetBroadcastBadge" class="bg-pink-50 border border-pink-200 text-pink-800 px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1.5">
+              <span id="targetModeEmoji">🥇</span>
+              <span id="targetMarbleName">대기 중...</span>
+            </div>
+
+            <button
+              type="button"
+              id="cameraToggleBtn"
+              onclick="toggleCameraViewMode()"
+              class="clay-pill bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1"
+            >
+              <span id="cameraToggleIcon">🎯</span>
+              <span id="cameraToggleText">타겟 추적 중</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Canvas Container (Responsive 9:16 Friendly Viewport) -->
+        <div id="canvasWrapper" class="relative w-full max-w-[540px] mx-auto rounded-3xl overflow-hidden border-4 border-slate-100 shadow-inner bg-[#FFFDF9]" style="aspect-ratio: 3 / 4.6;">
+          <canvas id="rouletteCanvas" width="600" height="920" class="w-full h-full block"></canvas>
+
+          <!-- Floating Speed-Up / Slow-Mo Alert Banner inside Canvas -->
+          <div id="canvasFloatingBanner" class="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 opacity-0 scale-90 transition-all duration-300 z-20">
+            <div id="canvasFloatingBannerInner" class="bg-amber-400/95 backdrop-blur-md text-slate-900 font-jua px-5 py-2 rounded-full shadow-lg border-2 border-white text-sm sm:text-base flex items-center gap-2 animate-pulse-pop">
+              <span>⚡</span>
+              <span id="canvasFloatingBannerText">속도가 빨라져요! (1.5x)</span>
+            </div>
+          </div>
+
+          <!-- Bottom Helper Overlay (Drag hint / Arrived count) -->
+          <div class="pointer-events-none absolute bottom-3 left-3 right-10 flex items-center justify-between text-[11px] font-bold text-slate-500">
+            <span class="bg-white/85 backdrop-blur px-2.5 py-1 rounded-full border border-slate-200/70 shadow-sm">
+              👆 화면을 위아래로 드래그해 구경할 수 있어요
+            </span>
+            <span id="arrivedCounterBadge" class="bg-white/90 backdrop-blur px-2.5 py-1 rounded-full border border-slate-200/70 text-slate-700 shadow-sm">
+              골인: 0 / 0
+            </span>
+          </div>
+        </div>
+
+        <!-- Bottom Action Bar Below Canvas -->
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2">
+          <div class="text-xs text-slate-400 font-medium">
+            ⚡ 20초 · 30초 경과 시 자동 가속 및 끼임 방지(Anti-Stuck)가 작동합니다.
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="nudgeAllMarbles()" class="clay-pill bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1">
+              <span>💥</span>
+              <span>구슬 흔들기 (톡!)</span>
+            </button>
+            <button onclick="restartGame()" class="clay-pill bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1">
+              <span>🔄</span>
+              <span>다시 굴리기</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- [AdSense Slot 2] Below Game Canvas Banner (Minimum 20px margin from interactive buttons) -->
+      <div class="ad-slot h-24 sm:h-28 w-full" aria-label="Advertisement">
+        <span class="text-[10px] font-bold tracking-widest uppercase bg-slate-200/80 text-slate-500 px-2 py-0.5 rounded mb-1">AD · SPONSORED</span>
+        <p class="text-xs sm:text-sm font-medium text-slate-400">구글 애드센스 게임 하단 멀티플렉스 / 디스플레이 배너 영역</p>
+      </div>
+    </section>
+
+    <!-- SEO & AdSense Approval Rich Content Section (Card News & FAQ) -->
+    <article class="mt-10 space-y-8">
+      
+      <!-- Section 1: Target Usage Scenarios (School / Church / University) -->
+      <section class="clay-card p-6 sm:p-8">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="text-2xl">🌈</span>
+          <h2 class="font-jua text-xl sm:text-2xl text-slate-800">학교 교실 · 교회 · 대학 모임별 200% 활용 꿀팁</h2>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-6">
+          <strong>말랑 젤리 마블 룰렛</strong>은 기존의 어둡고 사행성 카지노 느낌이 나는 룰렛 게임들과 달리, 밝고 따뜻한 파스텔 색감과 맑은 실로폰·마림바 사운드로 제작되어 초등학교 전자칠판부터 교회 청년부, 대학교 강의실까지 어디서나 기분 좋게 사용할 수 있는 무료 웹 핀볼 사다리 타기 도구입니다.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Card 1 -->
+          <div class="bg-amber-50/70 border-2 border-amber-100 rounded-3xl p-5">
+            <div class="w-10 h-10 rounded-2xl bg-amber-200/80 flex items-center justify-center text-xl mb-3">🏫</div>
+            <h3 class="font-jua text-lg text-slate-800 mb-1.5">초등학교 & 중·고교 교실</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              선생님께서 일일이 학생 이름을 입력할 필요 없이 <strong>[출석번호 생성]</strong> 버튼 하나로 1번 ~ 25번(또는 최대 60번) 구슬을 1초 만에 세팅할 수 있습니다. 수업 발표자 뽑기, 청소 당번, 모둠 순서 정하기를 40초 안에 공정하고 흥미진진하게 진행해 보세요.
+            </p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-pink-50/70 border-2 border-pink-100 rounded-3xl p-5">
+            <div class="w-10 h-10 rounded-2xl bg-pink-200/80 flex items-center justify-center text-xl mb-3">⛪</div>
+            <h3 class="font-jua text-lg text-slate-800 mb-1.5">교회 주일학교 & 청년부 셀모임</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              주일학교 레크리에이션이나 청년부 소그룹 모임에서 간식 쏘기, 설거지 당번, 릴레이 기도 및 나눔 순서를 정할 때 활용해 보세요. <strong>[대진표 링크 복사]</strong> 기능으로 카카오톡 단톡방에 참가자 명단을 그대로 공유할 수 있습니다.
+            </p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-sky-50/70 border-2 border-sky-100 rounded-3xl p-5">
+            <div class="w-10 h-10 rounded-2xl bg-sky-200/80 flex items-center justify-center text-xl mb-3">🎓</div>
+            <h3 class="font-jua text-lg text-slate-800 mb-1.5">대학생 조별과제 & 동아리 MT</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              조별과제에서 조장, 발표자, PPT 제작, 자료조사 역할을 나눌 때 <code class="bg-white px-1 rounded">이름*개수</code> 기능을 응용해 학년별·상황별 가중치를 줄 수 있습니다. 결승선 직전 슬로우 모션 연출이 모임 분위기를 한층 띄워 줍니다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Map Mechanics & 40-Second Physics Engine Explanation -->
+      <section class="clay-card p-6 sm:p-8">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="text-2xl">⚙️</span>
+          <h2 class="font-jua text-xl sm:text-2xl text-slate-800">3가지 테마 맵 특징 및 40초 컷 물리 알고리즘 안내</h2>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-5">
+          일반적인 핀볼 제비뽑기 게임은 구슬이 장애물 사이에 멈추거나 1분 이상 루즈하게 늘어지는 단점이 있습니다. 본 서비스는 정밀 2D 물리 엔진(Matter.js) 기반의 <strong>시간대별 동적 중력 제어(Time-Attack Gravity Control)</strong> 및 <strong>끼임 방지(Anti-Stuck)</strong> 시스템을 탑재하여 언제나 30 ~ 40초 이내에 결과가 도출됩니다.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+            <h4 class="font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
+              <span>⏱️</span>
+              <span>구간별 타임어택 가속 시스템</span>
+            </h4>
+            <ul class="space-y-1.5 text-slate-600">
+              <li>• <strong>0 ~ 20초 구간:</strong> 기본 중력(1.0G)과 높은 탄성으로 젤리 구슬이 통통 튀며 엎치락뒤치락 경쟁합니다.</li>
+              <li>• <strong>20 ~ 30초 구간:</strong> 중력이 1.6G로 증가하고 풍차와 별톱니 회전 속도가 1.5배 빨라지며 속도감을 높입니다.</li>
+              <li>• <strong>30 ~ 40초 구간:</strong> 중력이 2.5G로 강화되고 반발 계수가 조정되어 남은 구슬이 결승선 깔때기로 빠르게 골인합니다.</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+            <h4 class="font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
+              <span>🗺️</span>
+              <span>테마 맵 3종 밸런스 가이드</span>
+            </h4>
+            <ul class="space-y-1.5 text-slate-600">
+              <li>• <strong>🍭 솜사탕 퐁퐁:</strong> 지그재그 파스텔 핀과 좌우 이동 구름 슬라이더가 배치된 가장 표준적인 밸런스 맵입니다.</li>
+              <li>• <strong>🎡 바람개비 언덕:</strong> 대형 회전 바람개비 3개와 통통 튀는 젤리 범퍼가 예측 불허의 순위 변동을 만듭니다.</li>
+              <li>• <strong>⭐ 도키도키 깔때기:</strong> 다단 깔때기 미끄럼틀과 회전 별톱니가 결합되어 결승선 직전 대역전이 자주 일어납니다.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: FAQ Accordion -->
+      <section class="clay-card p-6 sm:p-8">
+        <div class="flex items-center gap-2.5 mb-4">
+          <span class="text-2xl">💬</span>
+          <h2 class="font-jua text-xl sm:text-2xl text-slate-800">자주 묻는 질문 (FAQ)</h2>
+        </div>
+
+        <div class="space-y-3">
+          <details class="group bg-slate-50 rounded-2xl border border-slate-200/80 p-4 cursor-pointer">
+            <summary class="font-bold text-sm sm:text-base text-slate-800 flex items-center justify-between list-none">
+              <span>Q1. 특정 참가자의 당첨 확률(구슬 개수)을 늘릴 수 있나요?</span>
+              <span class="text-pink-500 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <p class="mt-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              네, 가능합니다! 참가자 입력창에 <code class="bg-white px-1.5 py-0.5 rounded border">철수*3, 영희*2, 민수</code> 형태로 이름 뒤에 별표(*)와 숫자를 적으면 해당 숫자만큼 구슬이 생성됩니다. 한 번의 게임에서 최대 120개의 구슬까지 부드럽게 시뮬레이션할 수 있습니다.
+            </p>
+          </details>
+
+          <details class="group bg-slate-50 rounded-2xl border border-slate-200/80 p-4 cursor-pointer">
+            <summary class="font-bold text-sm sm:text-base text-slate-800 flex items-center justify-between list-none">
+              <span>Q2. '가장 먼저 도착(1등)'과 '가장 늦게 도착(꼴찌)' 중 어떤 모드가 좋나요?</span>
+              <span class="text-pink-500 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <p class="mt-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              경품 추첨이나 빠른 발표자 선정에는 선두 그룹을 박진감 넘치게 추적하는 <strong>[🥇 가장 먼저 도착 (1등)]</strong> 모드를 추천하며, 간식 내기나 당번 뽑기처럼 끝까지 살아남는 긴장감을 원하실 때는 최하위 구슬을 끝까지 비춰주는 <strong>[🐢 가장 늦게 도착 (꼴찌)]</strong> 모드를 추천합니다.
+            </p>
+          </details>
+
+          <details class="group bg-slate-50 rounded-2xl border border-slate-200/80 p-4 cursor-pointer">
+            <summary class="font-bold text-sm sm:text-base text-slate-800 flex items-center justify-between list-none">
+              <span>Q3. 결과는 100% 공정한가요? 조작 가능성은 없나요?</span>
+              <span class="text-pink-500 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <p class="mt-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              모든 구슬은 게임 시작 시 상단 출발 구역에서 무작위(Random Shuffle) 순서와 미세한 초기 진동값을 부여받으며, 오픈소스 물리 엔진인 Matter.js의 실시간 강체 충돌 연산에 의해서만 움직입니다. 특정 이름을 유리하거나 불리하게 만드는 인위적인 코드가 전혀 없으므로 100% 공정합니다.
+            </p>
+          </details>
+        </div>
+      </section>
+
+    </article>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200/80 bg-white/70 py-8 text-center text-xs text-slate-400">
+    <div class="max-w-4xl mx-auto px-4 space-y-1.5">
+      <p class="font-bold text-slate-600">🍬 말랑 젤리 마블 룰렛 (Soft Pop & Claymorphism Marble Roulette)</p>
+      <p>교실 · 교회 · 대학 모임을 위한 건전하고 감각적인 40초 타임어택 핀볼 사다리 게임</p>
+      <p>© 2026 Jelly Marble Studio. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Winner Result Modal -->
+  <div id="winnerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/55 backdrop-blur-sm">
+    <div class="clay-card max-w-md w-full p-6 sm:p-7 bg-white text-center relative animate-float" style="animation-duration: 4s;">
+      
+      <!-- Close Button -->
+      <button onclick="closeWinnerModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center">
+        ✕
+      </button>
+
+      <div class="inline-flex items-center gap-1.5 bg-pink-100 text-pink-700 font-jua text-xs px-3.5 py-1 rounded-full mb-2">
+        <span id="modalModeBadgeIcon">🎉</span>
+        <span id="modalModeBadgeText">선착순 1등 당첨 결과</span>
+      </div>
+
+      <h3 class="font-jua text-2xl sm:text-3xl text-slate-800 mb-1">축하합니다! 당첨 주인공</h3>
+      <p id="modalElapsedText" class="text-xs text-slate-400 mb-4">소요 시간: 24.5초 · 솜사탕 퐁퐁 맵</p>
+
+      <!-- Winner Spotlight Box -->
+      <div class="bg-gradient-to-br from-pink-50 via-amber-50 to-sky-50 border-2 border-pink-200 rounded-3xl p-5 mb-4 shadow-inner">
+        <div id="winnerMarblePreview" class="w-16 h-16 rounded-full mx-auto mb-2.5 shadow-md flex items-center justify-center text-2xl font-jua text-white border-4 border-white" style="background: radial-gradient(circle at 30% 30%, #FFAFCC, #FF7EB6);">
+          ★
+        </div>
+        <div id="winnerNameDisplay" class="font-jua text-3xl sm:text-4xl text-slate-800 break-all">
+          민수
+        </div>
+      </div>
+
+      <!-- Arrival Ranking Mini List -->
+      <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200/80 text-left mb-5 max-h-28 overflow-y-auto">
+        <div class="text-[11px] font-bold text-slate-400 mb-1.5">🏁 골인 순서 기록</div>
+        <div id="rankingListContainer" class="flex flex-wrap gap-1.5 text-xs">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- [AdSense Slot 3] Inside Result Modal (Minimum 20px margin from buttons below) -->
+      <div class="ad-slot h-20 w-full my-6" aria-label="Advertisement">
+        <span class="text-[10px] font-bold tracking-widest uppercase bg-slate-200/80 text-slate-500 px-2 py-0.5 rounded mb-0.5">AD · SPONSORED</span>
+        <p class="text-xs font-medium text-slate-400">결과 모달 전용 고주목도 배너 영역 (300x100)</p>
+      </div>
+
+      <!-- Action Buttons (Separated by my-6 = 24px from Ad slot) -->
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button onclick="shareWinnerResult()" class="clay-btn py-3.5 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-jua text-base flex items-center justify-center gap-1.5">
+          <span>📤</span>
+          <span>결과 공유하기</span>
+        </button>
+        <button onclick="closeModalAndRestart()" class="clay-btn py-3.5 px-4 rounded-2xl bg-gradient-to-r from-candypink to-coral text-white font-jua text-base flex items-center justify-center gap-1.5">
+          <span>🔄</span>
+          <span>다시 하기</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Application Script -->
+  <script>
+    /*************************************************************************
+     * 1. WEB AUDIO API SYNTHESIZER (Cute Marimba, Water-drop & Fanfare)
+     *************************************************************************/
+    let audioCtx = null;
+    let isMuted = false;
+    let lastSoundTime = 0;
+
+    // Pentatonic & bright major frequencies for pleasant classroom/church sound
+    const MARIMBA_NOTES = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51];
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleMute() {
+      initAudio();
+      isMuted = !isMuted;
+      const icon = document.getElementById('soundIcon');
+      const label = document.getElementById('soundLabel');
+      const btn = document.getElementById('soundToggleBtn');
+      if (isMuted) {
+        icon.textContent = '🔇';
+        label.textContent = '음소거됨';
+        btn.classList.replace('bg-slate-100', 'bg-rose-50');
+      } else {
+        icon.textContent = '🔊';
+        label.textContent = '효과음 ON';
+        btn.classList.replace('bg-rose-50', 'bg-slate-100');
+        playPopNote(783.99, 0.12);
+      }
+    }
+
+    // Play a cute marimba/kalimba pop note on peg/bumper collision
+    function playCollisionSound(intensity = 1) {
+      if (isMuted) return;
+      const now = performance.now();
+      if (now - lastSoundTime < 42) return; // Throttle overlapping collisions
+      lastSoundTime = now;
+
+      initAudio();
+      if (!audioCtx) return;
+
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const freq = MARIMBA_NOTES[Math.floor(Math.random() * MARIMBA_NOTES.length)];
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        // Subtle pitch bend up for water-drop/kalimba feel
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.04, audioCtx.currentTime + 0.08);
+
+        const vol = Math.min(0.16, Math.max(0.03, intensity * 0.08));
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.11);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch (e) {
+        // Ignore audio context restrictions
+      }
+    }
+
+    function playPopNote(freq = 659.25, duration = 0.15) {
+      if (isMuted) return;
+      initAudio();
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playSpeedUpJingle() {
+      if (isMuted) return;
+      initAudio();
+      if (!audioCtx) return;
+      const notes = [587.33, 783.99, 1046.50];
+      notes.forEach((f, idx) => {
+        setTimeout(() => playPopNote(f, 0.14), idx * 90);
+      });
+    }
+
+    function playWinnerFanfare() {
+      if (isMuted) return;
+      initAudio();
+      if (!audioCtx) return;
+      const melody = [
+        { f: 523.25, d: 0.14, t: 0 },
+        { f: 659.25, d: 0.14, t: 110 },
+        { f: 783.99, d: 0.14, t: 220 },
+        { f: 1046.50, d: 0.38, t: 340 },
+        { f: 783.99, d: 0.14, t: 540 },
+        { f: 1046.50, d: 0.50, t: 680 }
+      ];
+      melody.forEach(n => {
+        setTimeout(() => playPopNote(n.f, n.d), n.t);
+      });
+    }
+
+    /*************************************************************************
+     * 2. COLOR PALETTE & GAME STATE CONFIGURATION
+     *************************************************************************/
+    const MARBLE_PALETTE = [
+      { main: '#FF7EB6', light: '#FFC4DE', dark: '#D64584' }, // Candy Pink
+      { main: '#42D392', light: '#A8F5D2', dark: '#1FA368' }, // Mint Green
+      { main: '#FFD166', light: '#FFF0C2', dark: '#D99B16' }, // Butter Yellow
+      { main: '#4EA8DE', light: '#B8E1FA', dark: '#2376A8' }, // Sky Blue
+      { main: '#B5838D', light: '#E8CFD4', dark: '#87545E' }, // Soft Lavender
+      { main: '#FF928B', light: '#FFD1CE', dark: '#D95B53' }, // Coral
+      { main: '#9B89B3', light: '#DDD3EB', dark: '#6A5685' }, // Pastel Purple
+      { main: '#FFAC81', light: '#FFE0CF', dark: '#D97A4A' }  // Peach
+    ];
+
+    const WORLD_WIDTH = 600;
+    const WORLD_HEIGHT = 2400;
+    const VIEWPORT_HEIGHT = 920;
+    const FINISH_LINE_Y = 2210;
+    const SLOW_MO_ZONE_Y = 1940;
+
+    let currentMapId = 1;
+    let winningMode = 'first'; // 'first' or 'last'
+    let cameraFollowMode = true; // true = follow target marble, false = overview/manual
+
+    // Matter.js instances
+    const { Engine, World, Bodies, Body, Events, Composite } = Matter;
+    let engine = null;
+    let world = null;
+
+    // Entities
+    let marbles = [];
+    let rotatingObstacles = [];
+    let movingSliders = [];
+    let pegs = [];
+    let bumpers = [];
+    let staticWalls = [];
+    let hitRipples = [];
+    let popParticles = [];
+
+    // Game Runtime State
+    let isGameRunning = false;
+    let isGameFinished = false;
+    let gameStartTime = 0;
+    let elapsedSeconds = 0;
+    let currentSpeedPhase = 1; // 1 (0~20s), 2 (20~30s), 3 (30~40s)
+    let speedMultiplier = 1.0;
+    let slowMoActive = false;
+    let slowMoTriggered = false;
+    let slowMoEndTime = 0;
+
+    // Camera State
+    let cameraY = 0;
+    let isDraggingCamera = false;
+    let dragStartY = 0;
+    let dragStartCameraY = 0;
+    let targetMarble = null;
+    let arrivedMarbles = [];
+    let finalWinner = null;
+
+    /*************************************************************************
+     * 3. UI PRESETS, PARSING & URL QUERY SYNC
+     *************************************************************************/
+    function showToast(message, icon = '✨') {
+      const box = document.getElementById('toastBox');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastMessage').textContent = message;
+      box.classList.remove('opacity-0', 'translate-y-[-16px]');
+      box.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.remove('opacity-100', 'translate-y-0');
+        box.classList.add('opacity-0', 'translate-y-[-16px]');
+      }, 2600);
+    }
+
+    function parseParticipantList() {
+      const raw = document.getElementById('namesInput').value.trim();
+      if (!raw) return [];
+
+      const tokens = raw.split(/[\n,]+/).map(t => t.trim()).filter(Boolean);
+      const result = [];
+
+      tokens.forEach(token => {
+        const match = token.match(/^(.+?)\*(\d+)$/);
+        if (match) {
+          const name = match[1].trim();
+          const count = Math.min(30, Math.max(1, parseInt(match[2], 10)));
+          for (let i = 0; i < count; i++) {
+            result.push(name);
+          }
+        } else {
+          result.push(token);
+        }
+      });
+
+      // Cap total marbles at 120 for smooth mobile performance
+      return result.slice(0, 120);
+    }
+
+    function updateParticipantBadge() {
+      const list = parseParticipantList();
+      const badge = document.getElementById('participantCountBadge');
+      badge.textContent = `총 ${list.length}개 구슬`;
+    }
+
+    function applySchoolNumberPreset() {
+      const countInput = document.getElementById('studentCountInput');
+      let count = parseInt(countInput.value, 10);
+      if (isNaN(count) || count < 2) count = 2;
+      if (count > 60) count = 60;
+      countInput.value = count;
+
+      const numbers = [];
+      for (let i = 1; i <= count; i++) {
+        numbers.push(`${i}번`);
+      }
+      document.getElementById('namesInput').value = numbers.join(', ');
+      updateParticipantBadge();
+      playPopNote(659.25, 0.12);
+      showToast(`출석번호 1번 ~ ${count}번 구슬이 세팅되었습니다!`, '🏫');
+    }
+
+    function applyPreset(type) {
+      const input = document.getElementById('namesInput');
+      if (type === 'church') {
+        input.value = '간식쏘기*2, 설거지당번*2, 청소당번, 찬양인도, 대표기도, 릴레이나눔';
+        showToast('모임/교회 당번 프리셋이 적용되었습니다!', '⛪');
+      } else if (type === 'uni') {
+        input.value = '발표자*2, PPT제작*2, 자료조사1, 자료조사2, 서기및정리, 커피쏘기';
+        showToast('대학생 팀플 역할 프리셋이 적용되었습니다!', '🎓');
+      }
+      updateParticipantBadge();
+      playPopNote(783.99, 0.12);
+    }
+
+    function clearParticipants() {
+      document.getElementById('namesInput').value = '';
+      updateParticipantBadge();
+      showToast('참가자 명단이 초기화되었습니다.', '🧹');
+    }
+
+    function selectMap(mapId) {
+      currentMapId = mapId;
+      [1, 2, 3].forEach(id => {
+        const btn = document.getElementById(`mapBtn${id}`);
+        if (id === mapId) {
+          btn.className = 'map-select-btn clay-pill p-3 rounded-2xl border-2 border-pink-400 bg-pink-50/90 text-left flex flex-col justify-between transition';
+        } else {
+          btn.className = 'map-select-btn clay-pill p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-left flex flex-col justify-between transition';
+        }
+      });
+      playPopNote(587.33 + mapId * 110, 0.1);
+      // Rebuild preview stage if not actively running
+      if (!isGameRunning) {
+        setupPhysicsWorld(false);
+      }
+    }
+
+    function selectMode(mode) {
+      winningMode = mode;
+      const firstBtn = document.getElementById('modeBtnFirst');
+      const lastBtn = document.getElementById('modeBtnLast');
+      const modeEmoji = document.getElementById('targetModeEmoji');
+
+      if (mode === 'first') {
+        firstBtn.className = 'clay-pill py-2.5 px-3 rounded-2xl border-2 border-emerald-400 bg-emerald-50 text-emerald-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-2';
+        lastBtn.className = 'clay-pill py-2.5 px-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 font-bold text-xs sm:text-sm flex items-center justify-center gap-2';
+        modeEmoji.textContent = '🥇';
+      } else {
+        lastBtn.className = 'clay-pill py-2.5 px-3 rounded-2xl border-2 border-amber-400 bg-amber-50 text-amber-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-2';
+        firstBtn.className = 'clay-pill py-2.5 px-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 font-bold text-xs sm:text-sm flex items-center justify-center gap-2';
+        modeEmoji.textContent = '🐢';
+      }
+      playPopNote(783.99, 0.1);
+    }
+
+    function toggleSetupPanel(expand) {
+      const setupPanel = document.getElementById('setupPanel');
+      const compactBar = document.getElementById('compactSetupBar');
+      const mapNames = { 1: '솜사탕 퐁퐁', 2: '바람개비 언덕', 3: '도키도키 깔때기' };
+      const list = parseParticipantList();
+
+      if (expand) {
+        setupPanel.classList.remove('hidden');
+        compactBar.classList.add('hidden');
+      } else {
+        setupPanel.classList.add('hidden');
+        compactBar.classList.remove('hidden');
+        document.getElementById('compactSummaryText').textContent =
+          `구슬 ${list.length}개 · ${mapNames[currentMapId]} 맵 · ${winningMode === 'first' ? '선착순 1등' : '마지막 꼴찌'}`;
+      }
+    }
+
+    function shareCurrentSetupUrl() {
+      const rawNames = document.getElementById('namesInput').value.trim();
+      const params = new URLSearchParams();
+      if (rawNames) params.set('names', rawNames);
+      params.set('map', String(currentMapId));
+      params.set('mode', winningMode);
+
+      const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+      try {
+        window.history.replaceState({}, '', `?${params.toString()}`);
+      } catch (e) {}
+
+      copyTextToClipboard(shareUrl);
+      showToast('대진표 링크가 복사되었습니다! 단톡방에 붙여넣어 보세요.', '🔗');
+    }
+
+    function loadStateFromUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const namesParam = params.get('names');
+      const mapParam = parseInt(params.get('map'), 10);
+      const modeParam = params.get('mode');
+
+      if (namesParam && namesParam.trim().length > 0) {
+        document.getElementById('namesInput').value = namesParam;
+      }
+      if ([1, 2, 3].includes(mapParam)) {
+        selectMap(mapParam);
+      }
+      if (modeParam === 'first' || modeParam === 'last') {
+        selectMode(modeParam);
+      }
+      updateParticipantBadge();
+    }
+
+    function copyTextToClipboard(text) {
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      tempInput.style.position = 'fixed';
+      tempInput.style.left = '-9999px';
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {}
+      document.body.removeChild(tempInput);
+    }
+
+    /*************************************************************************
+     * 4. MATTER.JS WORLD & 3 MAPS CONSTRUCTION
+     *************************************************************************/
+    function setupPhysicsWorld(spawnMarblesNow = false) {
+      if (engine) {
+        World.clear(world);
+        Engine.clear(engine);
+      }
+
+      engine = Engine.create({
+        positionIterations: 8,
+        velocityIterations: 6
+      });
+      world = engine.world;
+      world.gravity.y = 1.0;
+
+      marbles = [];
+      rotatingObstacles = [];
+      movingSliders = [];
+      pegs = [];
+      bumpers = [];
+      staticWalls = [];
+      hitRipples = [];
+      popParticles = [];
+      arrivedMarbles = [];
+      finalWinner = null;
+      targetMarble = null;
+      cameraY = 0;
+
+      // Build Outer Boundaries & Top Funnel + Bottom Finish Funnel
+      buildCommonBoundaries();
+
+      // Build Map-specific Obstacles
+      if (currentMapId === 1) {
+        buildMap1SweetPegs();
+      } else if (currentMapId === 2) {
+        buildMap2WindmillPark();
+      } else {
+        buildMap3LuckyFunnel();
+      }
+
+      // Build Final Finish Approach Funnel (y: 1920 ~ 2220)
+      buildFinishFunnelZone();
+
+      if (spawnMarblesNow) {
+        spawnParticipantMarbles();
+      }
+
+      // Collision Events for Sound & Visual Ripples
+      Events.on(engine, 'collisionStart', handleCollisions);
+    }
+
+    function addWall(x, y, w, h, angle = 0, color = '#E2E8F0') {
+      const body = Bodies.rectangle(x, y, w, h, {
+        isStatic: true,
+        angle: angle,
+        restitution: 0.4,
+        friction: 0.005,
+        renderColor: color
+      });
+      staticWalls.push({ body, w, h, color });
+      World.add(world, body);
+      return body;
+    }
+
+    function addPeg(x, y, radius = 9, color = '#FF7EB6') {
+      const body = Bodies.circle(x, y, radius, {
+        isStatic: true,
+        restitution: 0.65,
+        friction: 0.002,
+        label: 'peg'
+      });
+      const pegObj = { body, x, y, radius, color, hitTime: 0 };
+      body.pluginData = pegObj;
+      pegs.push(pegObj);
+      World.add(world, body);
+    }
+
+    function addJellyBumper(x, y, radius = 26, color = '#FFD166') {
+      const body = Bodies.circle(x, y, radius, {
+        isStatic: true,
+        restitution: 1.15,
+        friction: 0.001,
+        label: 'bumper'
+      });
+      const bumperObj = { body, x, y, radius, color, hitScale: 1.0 };
+      body.pluginData = bumperObj;
+      bumpers.push(bumperObj);
+      World.add(world, body);
+    }
+
+    function addWindmill(x, y, armLength = 130, armWidth = 14, baseSpeed = 0.025, color = '#4EA8DE', blades = 2) {
+      const parts = [];
+      for (let i = 0; i < blades; i++) {
+        const angle = (Math.PI / blades) * i;
+        const rect = Bodies.rectangle(x, y, armLength, armWidth, {
+          angle: angle,
+          restitution: 0.5,
+          friction: 0.005
+        });
+        parts.push(rect);
+      }
+      const compound = Body.create({
+        parts: parts,
+        isStatic: true,
+        label: 'windmill'
+      });
+      const wmObj = { body: compound, x, y, armLength, armWidth, baseSpeed, color, blades };
+      rotatingObstacles.push(wmObj);
+      World.add(world, compound);
+    }
+
+    function addMovingCloudSlider(x, y, w = 110, h = 22, rangeX = 140, speed = 0.003, phase = 0, color = '#42D392') {
+      const body = Bodies.rectangle(x, y, w, h, {
+        isStatic: true,
+        chamfer: { radius: 11 },
+        restitution: 0.7,
+        friction: 0.005,
+        label: 'slider'
+      });
+      const sliderObj = { body, originX: x, y, w, h, rangeX, speed, phase, color };
+      movingSliders.push(sliderObj);
+      World.add(world, body);
+    }
+
+    function buildCommonBoundaries() {
+      // Thick left & right walls so marbles never escape
+      addWall(-20, WORLD_HEIGHT / 2, 80, WORLD_HEIGHT + 400, 0, '#E2E8F0');
+      addWall(WORLD_WIDTH + 20, WORLD_HEIGHT / 2, 80, WORLD_HEIGHT + 400, 0, '#E2E8F0');
+
+      // Top starter funnel shoulders
+      addWall(65, 210, 180, 20, 0.35, '#FBCFE8');
+      addWall(WORLD_WIDTH - 65, 210, 180, 20, -0.35, '#FBCFE8');
+    }
+
+    // MAP 1: 솜사탕 퐁퐁 (Sweet Pegs + Jelly Bumpers + Cloud Sliders)
+    function buildMap1SweetPegs() {
+      const pegColors = ['#FF7EB6', '#4EA8DE', '#42D392', '#FFD166', '#B5838D'];
+
+      // Section A (y: 280 ~ 760): Zig-zag candy pegs
+      let rowIdx = 0;
+      for (let y = 290; y <= 770; y += 68) {
+        const isEven = rowIdx % 2 === 0;
+        const startX = isEven ? 85 : 120;
+        const endX = isEven ? 515 : 480;
+        const color = pegColors[rowIdx % pegColors.length];
+        for (let x = startX; x <= endX; x += 72) {
+          addPeg(x, y, 9, color);
+        }
+        rowIdx++;
+      }
+
+      // Side gentle bumpers
+      addWall(45, 520, 90, 16, 0.5, '#FDE68A');
+      addWall(WORLD_WIDTH - 45, 520, 90, 16, -0.5, '#FDE68A');
+
+      // Section B (y: 850 ~ 1280): Bouncy Jelly Bumpers & Peg Clusters
+      addJellyBumper(190, 880, 28, '#FF7EB6');
+      addJellyBumper(410, 880, 28, '#4EA8DE');
+      addJellyBumper(300, 980, 32, '#FFD166');
+      addJellyBumper(160, 1090, 26, '#42D392');
+      addJellyBumper(440, 1090, 26, '#FF928B');
+      addJellyBumper(300, 1200, 28, '#B5838D');
+
+      // Mini windmills on sides
+      addWindmill(120, 980, 95, 12, 0.03, '#42D392', 2);
+      addWindmill(480, 980, 95, 12, -0.03, '#FF928B', 2);
+
+      // Section C (y: 1320 ~ 1850): Peg forest + Moving Cloud Bouncers
+      for (let y = 1320; y <= 1680; y += 72) {
+        const offset = ((y / 72) % 2 === 0) ? 90 : 125;
+        for (let x = offset; x <= 510; x += 70) {
+          addPeg(x, y, 8.5, pegColors[(x + y) % pegColors.length]);
+        }
+      }
+
+      addMovingCloudSlider(300, 1480, 115, 22, 140, 0.0032, 0, '#4EA8DE');
+      addMovingCloudSlider(300, 1770, 125, 22, 130, 0.0038, Math.PI, '#FF7EB6');
+    }
+
+    // MAP 2: 바람개비 언덕 (Windmill Park)
+    function buildMap2WindmillPark() {
+      // Top scattering pegs
+      for (let x = 110; x <= 490; x += 76) {
+        addPeg(x, 280, 9, '#4EA8DE');
+        if (x < 480) addPeg(x + 38, 345, 9, '#FF7EB6');
+      }
+
+      // Giant Windmill Trio (Upper)
+      addWindmill(200, 490, 155, 15, 0.028, '#FF7EB6', 2);
+      addWindmill(400, 490, 155, 15, -0.028, '#4EA8DE', 2);
+      addWindmill(300, 680, 175, 16, 0.032, '#FFD166', 3);
+
+      // Side deflectors
+      addWall(65, 620, 120, 18, 0.45, '#A7F3D0');
+      addWall(WORLD_WIDTH - 65, 620, 120, 18, -0.45, '#A7F3D0');
+
+      // Middle Jelly Mushroom Zone (y: 840 ~ 1220)
+      addJellyBumper(150, 860, 30, '#42D392');
+      addJellyBumper(300, 850, 34, '#FF928B');
+      addJellyBumper(450, 860, 30, '#42D392');
+
+      for (let y = 960; y <= 1160; y += 66) {
+        for (let x = 100; x <= 500; x += 80) {
+          addPeg(x + ((y % 132 === 0) ? 0 : 25), y, 9, '#B5838D');
+        }
+      }
+
+      // Lower Giant Windmills (y: 1320 ~ 1650)
+      addWindmill(185, 1340, 150, 15, -0.034, '#42D392', 3);
+      addWindmill(415, 1340, 150, 15, 0.034, '#FF928B', 3);
+      addWindmill(300, 1540, 180, 16, -0.03, '#4EA8DE', 2);
+
+      // Bottom Bouncers + Cloud Slider
+      addJellyBumper(190, 1720, 26, '#FFD166');
+      addJellyBumper(410, 1720, 26, '#FF7EB6');
+      addMovingCloudSlider(300, 1820, 110, 20, 120, 0.004, 0.5, '#42D392');
+    }
+
+    // MAP 3: 도키도키 깔때기 (Lucky Funnel)
+    function buildMap3LuckyFunnel() {
+      // Stage 1: Wide Peg Plinko + Star Gears (y: 280 ~ 640)
+      for (let y = 280; y <= 480; y += 65) {
+        for (let x = 95; x <= 505; x += 68) {
+          addPeg(x + ((y % 130 === 0) ? 18 : -18), y, 8.5, '#FFD166');
+        }
+      }
+
+      // First Narrowing Funnel (y: 620) with Star Gear in the middle
+      addWall(115, 620, 240, 20, 0.38, '#FBCFE8');
+      addWall(WORLD_WIDTH - 115, 620, 240, 20, -0.38, '#FBCFE8');
+      addWindmill(300, 680, 115, 14, 0.038, '#FF7EB6', 3);
+
+      // Stage 2: Split Reversal Chamber (y: 800 ~ 1250)
+      addJellyBumper(300, 830, 32, '#4EA8DE');
+      addWindmill(170, 960, 130, 14, -0.032, '#42D392', 3);
+      addWindmill(430, 960, 130, 14, 0.032, '#FF928B', 3);
+
+      // Second Narrowing Funnel (y: 1150)
+      addWall(110, 1140, 230, 20, 0.42, '#BAE6FD');
+      addWall(WORLD_WIDTH - 110, 1140, 230, 20, -0.42, '#BAE6FD');
+      addMovingCloudSlider(300, 1250, 100, 20, 110, 0.0045, 0, '#FFD166');
+
+      // Stage 3: High-Tension Zig-Zag Chutes & Star Spinners (y: 1360 ~ 1830)
+      addJellyBumper(190, 1390, 26, '#FF7EB6');
+      addJellyBumper(410, 1390, 26, '#42D392');
+
+      for (let y = 1490; y <= 1750; y += 65) {
+        for (let x = 110; x <= 490; x += 64) {
+          addPeg(x + ((y % 130 === 0) ? 16 : -16), y, 8.5, '#4EA8DE');
+        }
+      }
+      addWindmill(300, 1810, 135, 14, -0.036, '#B5838D', 3);
+    }
+
+    // Final Approach Funnel & Finish Zone (y: 1920 ~ 2360)
+    function buildFinishFunnelZone() {
+      // Smooth guiding funnel slopes toward the finish gate
+      addWall(110, 2010, 250, 24, 0.46, '#CBD5E1');
+      addWall(WORLD_WIDTH - 110, 2010, 250, 24, -0.46, '#CBD5E1');
+
+      // Final excitement pegs right above finish throat
+      addPeg(245, 1950, 8, '#FF7EB6');
+      addPeg(355, 1950, 8, '#4EA8DE');
+      addPeg(300, 2015, 8.5, '#FFD166');
+
+      // Holding basin at the very bottom below FINISH_LINE_Y (y: 2210 ~ 2360)
+      addWall(195, 2240, 240, 20, 0.1, '#E2E8F0');
+      addWall(WORLD_WIDTH - 195, 2240, 240, 20, -0.1, '#E2E8F0');
+      addWall(WORLD_WIDTH / 2, 2370, WORLD_WIDTH, 40, 0, '#CBD5E1');
+    }
+
+    function spawnParticipantMarbles() {
+      const names = parseParticipantList();
+      if (names.length === 0) return;
+
+      // Shuffle participant order fairly
+      const shuffled = [...names];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      // Dynamic radius based on count so even 60 marbles flow smoothly
+      const radius = shuffled.length > 40 ? 11.5 : (shuffled.length > 22 ? 13 : 14.5);
+      const cols = Math.min(10, Math.max(5, Math.ceil(Math.sqrt(shuffled.length * 1.5))));
+      const spacingX = Math.min(42, 380 / cols);
+      const startX = (WORLD_WIDTH - (cols - 1) * spacingX) / 2;
+
+      shuffled.forEach((name, idx) => {
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        const jitterX = (Math.random() - 0.5) * 8;
+        const jitterY = (Math.random() - 0.5) * 6;
+        const x = startX + col * spacingX + jitterX;
+        const y = 75 - row * (radius * 2.5) + jitterY;
+
+        const palette = MARBLE_PALETTE[idx % MARBLE_PALETTE.length];
+
+        const body = Bodies.circle(x, y, radius, {
+          restitution: 0.58,
+          friction: 0.002,
+          frictionAir: 0.0015,
+          density: 0.002,
+          label: 'marble'
+        });
+
+        // Give slight random initial horizontal velocity
+        Body.setVelocity(body, {
+          x: (Math.random() - 0.5) * 2.4,
+          y: Math.random() * 1.2
+        });
+
+        const marbleObj = {
+          id: idx,
+          name,
+          body,
+          radius,
+          palette,
+          trail: [],
+          stuckTimer: 0,
+          finished: false,
+          finishRank: null,
+          finishTime: null
+        };
+
+        body.pluginData = marbleObj;
+        marbles.push(marbleObj);
+        World.add(world, body);
+      });
+
+      updateArrivedBadge();
+    }
+
+    function handleCollisions(event) {
+      const pairs = event.pairs;
+      for (let i = 0; i < pairs.length; i++) {
+        const { bodyA, bodyB } = pairs[i];
+        const labels = [bodyA.label, bodyB.label];
+
+        if (labels.includes('marble')) {
+          const other = bodyA.label === 'marble' ? bodyB : bodyA;
+          const marbleBody = bodyA.label === 'marble' ? bodyA : bodyB;
+          const speed = VectorLength(marbleBody.velocity);
+
+          if (other.label === 'peg' && speed > 1.2) {
+            playCollisionSound(speed / 8);
+            if (other.pluginData) {
+              other.pluginData.hitTime = performance.now();
+              hitRipples.push({
+                x: other.position.x,
+                y: other.position.y,
+                r: other.pluginData.radius,
+                color: other.pluginData.color,
+                alpha: 0.85
+              });
+            }
+          } else if (other.label === 'bumper') {
+            playCollisionSound(1.4);
+            if (other.pluginData) {
+              other.pluginData.hitScale = 1.32;
+              hitRipples.push({
+                x: other.position.x,
+                y: other.position.y,
+                r: other.pluginData.radius,
+                color: other.pluginData.color,
+                alpha: 0.95
+              });
+            }
+          }
+        }
+      }
+    }
+
+    function VectorLength(v) {
+      return Math.sqrt(v.x * v.x + v.y * v.y);
+    }
+
+    /*************************************************************************
+     * 5. GAME FLOW, 40-SECOND TIME-ATTACK & ANTI-STUCK CONTROL
+     *************************************************************************/
+    function startGame() {
+      initAudio();
+      const list = parseParticipantList();
+      if (list.length < 2) {
+        showToast('최소 2개 이상의 구슬(참가자)을 입력해 주세요!', '⚠️');
+        document.getElementById('namesInput').focus();
+        return;
+      }
+
+      // Collapse setup panel for mobile-first focus
+      toggleSetupPanel(false);
+
+      // Smoothly scroll to game stage on mobile
+      const stageEl = document.getElementById('gameStageSection');
+      stageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Reset states
+      isGameRunning = true;
+      isGameFinished = false;
+      gameStartTime = performance.now();
+      elapsedSeconds = 0;
+      currentSpeedPhase = 1;
+      speedMultiplier = 1.0;
+      slowMoActive = false;
+      slowMoTriggered = false;
+      cameraFollowMode = true;
+      updateCameraToggleUI();
+
+      updateSpeedPhaseUI(1);
+      setupPhysicsWorld(true);
+      playPopNote(523.25, 0.12);
+      setTimeout(() => playPopNote(783.99, 0.18), 100);
+    }
+
+    function restartGame() {
+      closeWinnerModal();
+      startGame();
+    }
+
+    function nudgeAllMarbles() {
+      if (!marbles.length) return;
+      playPopNote(880, 0.12);
+      marbles.forEach(m => {
+        if (!m.finished) {
+          Body.setVelocity(m.body, {
+            x: (Math.random() - 0.5) * 6,
+            y: -4 - Math.random() * 3
+          });
+          spawnPopParticle(m.body.position.x, m.body.position.y, m.palette.main);
+        }
+      });
+      showToast('구슬들을 톡! 흔들어 주었습니다.', '💥');
+    }
+
+    function spawnPopParticle(x, y, color) {
+      for (let i = 0; i < 5; i++) {
+        popParticles.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4 - 1,
+          r: 3 + Math.random() * 3,
+          color,
+          alpha: 1.0
+        });
+      }
+    }
+
+    function showFloatingCanvasBanner(text, bgClass = 'bg-amber-400/95 text-slate-900') {
+      const wrap = document.getElementById('canvasFloatingBanner');
+      const inner = document.getElementById('canvasFloatingBannerInner');
+      const txt = document.getElementById('canvasFloatingBannerText');
+      inner.className = `${bgClass} backdrop-blur-md font-jua px-5 py-2 rounded-full shadow-lg border-2 border-white text-sm sm:text-base flex items-center gap-2 animate-pulse-pop`;
+      txt.textContent = text;
+      wrap.classList.remove('opacity-0', 'scale-90');
+      wrap.classList.add('opacity-100', 'scale-100');
+
+      clearTimeout(window._bannerTimer);
+      window._bannerTimer = setTimeout(() => {
+        wrap.classList.remove('opacity-100', 'scale-100');
+        wrap.classList.add('opacity-0', 'scale-90');
+      }, 2500);
+    }
+
+    function updateSpeedPhaseUI(phase) {
+      const badge = document.getElementById('speedPhaseBadge');
+      const text = document.getElementById('speedPhaseText');
+
+      if (phase === 1) {
+        badge.className = 'bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1 transition-all';
+        text.textContent = '통통 기본 중력 (1.0x)';
+      } else if (phase === 2) {
+        badge.className = 'bg-amber-100 text-amber-900 px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1 transition-all animate-pulse';
+        text.textContent = '⚡ 가속 모드 (1.5x)';
+      } else if (phase === 3) {
+        badge.className = 'bg-rose-100 text-rose-800 px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1 transition-all animate-pulse';
+        text.textContent = '🚀 초고속 골인 유도 (2.5x)';
+      }
+    }
+
+    // Guaranteed Under-40-Second Physics Controller
+    function updateTimeAttackPhysics(dtSeconds) {
+      if (!isGameRunning || isGameFinished) return;
+
+      elapsedSeconds = (performance.now() - gameStartTime) / 1000;
+      document.getElementById('timerDisplay').textContent = `${elapsedSeconds.toFixed(1).padStart(4, '0')}초`;
+
+      // Phase Transitions: 0 ~ 20s (Phase 1), 20 ~ 30s (Phase 2), 30 ~ 40s (Phase 3)
+      if (elapsedSeconds >= 20 && elapsedSeconds < 30 && currentSpeedPhase !== 2) {
+        currentSpeedPhase = 2;
+        world.gravity.y = 1.6;
+        speedMultiplier = 1.5;
+        updateSpeedPhaseUI(2);
+        showFloatingCanvasBanner('⚡ 속도가 빨라져요! (중력 1.6x · 회전 1.5x)');
+        playSpeedUpJingle();
+      } else if (elapsedSeconds >= 30 && currentSpeedPhase !== 3) {
+        currentSpeedPhase = 3;
+        world.gravity.y = 2.5;
+        speedMultiplier = 2.1;
+        // Lower restitution of remaining marbles so they slide swiftly downward
+        marbles.forEach(m => {
+          if (!m.finished) {
+            m.body.restitution = 0.22;
+            m.body.frictionAir = 0.0005;
+          }
+        });
+        updateSpeedPhaseUI(3);
+        showFloatingCanvasBanner('🚀 40초 컷 파이널 가속! (중력 2.5x)', 'bg-rose-500/95 text-white');
+        playSpeedUpJingle();
+      }
+
+      // Check Slow-Motion Finale Trigger
+      if (slowMoActive && performance.now() > slowMoEndTime) {
+        slowMoActive = false;
+      }
+
+      // Update active marbles: Anti-Stuck, Out-of-bounds guard, and Finish detection
+      const unfinishedMarbles = [];
+      marbles.forEach(m => {
+        const pos = m.body.position;
+        const vel = m.body.velocity;
+
+        // Safety horizontal bounds guard (prevent tunneling at high gravity)
+        if (pos.x < 28) {
+          Body.setPosition(m.body, { x: 34, y: pos.y });
+          Body.setVelocity(m.body, { x: Math.abs(vel.x) + 1.5, y: vel.y });
+        } else if (pos.x > WORLD_WIDTH - 28) {
+          Body.setPosition(m.body, { x: WORLD_WIDTH - 34, y: pos.y });
+          Body.setVelocity(m.body, { x: -Math.abs(vel.x) - 1.5, y: vel.y });
+        }
+
+        if (!m.finished) {
+          // Record motion trail
+          m.trail.push({ x: pos.x, y: pos.y });
+          if (m.trail.length > 9) m.trail.shift();
+
+          // Check Finish Line Crossing
+          if (pos.y >= FINISH_LINE_Y) {
+            m.finished = true;
+            m.finishRank = arrivedMarbles.length + 1;
+            m.finishTime = elapsedSeconds;
+            arrivedMarbles.push(m);
+            playCollisionSound(1.5);
+            spawnPopParticle(pos.x, FINISH_LINE_Y, m.palette.main);
+            updateArrivedBadge();
+
+            // Check Winning Condition!
+            if (winningMode === 'first' && arrivedMarbles.length === 1) {
+              triggerWinnerFinish(m);
+            } else if (winningMode === 'last' && arrivedMarbles.length === marbles.length) {
+              triggerWinnerFinish(m);
+            }
+          } else {
+            unfinishedMarbles.push(m);
+
+            // Anti-Stuck Detection: If speed near zero for > 1.15s above finish line
+            const speed = VectorLength(vel);
+            if (speed < 0.45 && pos.y > 140) {
+              m.stuckTimer += dtSeconds;
+              if (m.stuckTimer >= 1.15) {
+                m.stuckTimer = 0;
+                const centerBias = (WORLD_WIDTH / 2 - pos.x) * 0.015;
+                Body.setVelocity(m.body, {
+                  x: (Math.random() - 0.5) * 4.5 + centerBias,
+                  y: -3.2 - Math.random() * 2
+                });
+                spawnPopParticle(pos.x, pos.y, m.palette.main);
+              }
+            } else {
+              m.stuckTimer = Math.max(0, m.stuckTimer - dtSeconds * 2);
+            }
+
+            // Guaranteed < 40s Assist: After 34 seconds, guide any remaining marbles smoothly toward center & down
+            if (elapsedSeconds > 34) {
+              const pullToCenter = (WORLD_WIDTH / 2 - pos.x) * 0.00025;
+              Body.applyForce(m.body, pos, { x: pullToCenter, y: 0.00035 });
+            }
+          }
+        }
+      });
+
+      // Determine Target Marble for Camera & Broadcast Badge
+      if (unfinishedMarbles.length > 0) {
+        if (winningMode === 'first') {
+          // Highest Y (closest to finish line) among unfinished
+          unfinishedMarbles.sort((a, b) => b.body.position.y - a.body.position.y);
+          targetMarble = unfinishedMarbles[0];
+        } else {
+          // Lowest Y (furthest from finish line / last man standing)
+          unfinishedMarbles.sort((a, b) => a.body.position.y - b.body.position.y);
+          targetMarble = unfinishedMarbles[0];
+        }
+
+        // Update Live Broadcast Badge
+        document.getElementById('targetMarbleName').textContent =
+          winningMode === 'first'
+            ? `선두: ${targetMarble.name}`
+            : `최하위: ${targetMarble.name} (남은 ${unfinishedMarbles.length}개)`;
+
+        // Trigger Slow-Motion when Target Marble enters Final Approach Zone (1940 ~ 2180)
+        const ty = targetMarble.body.position.y;
+        const canTriggerSlowMo =
+          (winningMode === 'first' && arrivedMarbles.length === 0) ||
+          (winningMode === 'last' && unfinishedMarbles.length === 1);
+
+        if (canTriggerSlowMo && !slowMoTriggered && ty >= SLOW_MO_ZONE_Y && ty < FINISH_LINE_Y - 30) {
+          slowMoTriggered = true;
+          slowMoActive = true;
+          slowMoEndTime = performance.now() + 1700; // 1.7 seconds real-time slow-mo
+          showFloatingCanvasBanner('🎬 두근두근 결승선 슬로우 모션!', 'bg-pink-500/95 text-white');
+        }
+      }
+    }
+
+    function updateArrivedBadge() {
+      document.getElementById('arrivedCounterBadge').textContent =
+        `골인: ${arrivedMarbles.length} / ${marbles.length}`;
+    }
+
+    function triggerWinnerFinish(winnerMarble) {
+      if (isGameFinished) return;
+      isGameFinished = true;
+      isGameRunning = false;
+      slowMoActive = false;
+      finalWinner = winnerMarble;
+
+      document.getElementById('targetMarbleName').textContent = `🎉 당첨: ${winnerMarble.name}!`;
+
+      playWinnerFanfare();
+
+      // Fire Confetti Burst
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 90,
+          spread: 75,
+          origin: { y: 0.6 },
+          colors: ['#FF7EB6', '#42D392', '#FFD166', '#4EA8DE', '#FF928B']
+        });
+        setTimeout(() => {
+          confetti({
+            particleCount: 60,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0.1, y: 0.65 }
+          });
+          confetti({
+            particleCount: 60,
+            angle: 120,
+            spread: 55,
+            origin: { x: 0.9, y: 0.65 }
+          });
+        }, 300);
+      }
+
+      // Open Result Modal after brief celebration pause
+      setTimeout(() => {
+        openWinnerModal(winnerMarble);
+      }, 650);
+    }
+
+    function openWinnerModal(winner) {
+      const modal = document.getElementById('winnerModal');
+      const mapNames = { 1: '솜사탕 퐁퐁', 2: '바람개비 언덕', 3: '도키도키 깔때기' };
+
+      document.getElementById('modalModeBadgeText').textContent =
+        winningMode === 'first' ? '🥇 가장 먼저 도착 (선착순 1등)' : '🐢 가장 늦게 도착 (마지막 1명)';
+      document.getElementById('modalElapsedText').textContent =
+        `소요 시간: ${elapsedSeconds.toFixed(1)}초 · ${mapNames[currentMapId]} 맵`;
+      document.getElementById('winnerNameDisplay').textContent = winner.name;
+
+      const preview = document.getElementById('winnerMarblePreview');
+      preview.style.background = `radial-gradient(circle at 30% 30%, ${winner.palette.light}, ${winner.palette.main})`;
+      preview.textContent = winningMode === 'first' ? '🥇' : '🐢';
+
+      // Populate arrival ranking badges
+      const rankContainer = document.getElementById('rankingListContainer');
+      rankContainer.innerHTML = '';
+      arrivedMarbles.forEach((m, i) => {
+        const isWin = m.id === winner.id;
+        const span = document.createElement('span');
+        span.className = isWin
+          ? 'bg-pink-500 text-white font-bold px-2.5 py-1 rounded-full shadow-sm'
+          : 'bg-white text-slate-600 border border-slate-200 px-2.5 py-1 rounded-full';
+        span.textContent = `${i + 1}위 ${m.name}`;
+        rankContainer.appendChild(span);
+      });
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeWinnerModal() {
+      const modal = document.getElementById('winnerModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function closeModalAndRestart() {
+      closeWinnerModal();
+      startGame();
+    }
+
+    function shareWinnerResult() {
+      if (!finalWinner) return;
+      const modeTitle = winningMode === 'first' ? '선착순 1등' : '마지막 꼴찌';
+      const shareText = `🍬 [말랑 젤리 마블 룰렛 결과]\n🎯 당첨 기준: ${modeTitle}\n🏆 당첨 주인공: ${finalWinner.name} (${elapsedSeconds.toFixed(1)}초)\n링크: ${window.location.href}`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: '말랑 젤리 마블 룰렛 당첨 결과',
+          text: shareText,
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        copyTextToClipboard(shareText);
+        showToast('당첨 결과 텍스트가 클립보드에 복사되었습니다!', '📤');
+      }
+    }
+
+    /*************************************************************************
+     * 6. CAMERA CONTROLS & CUSTOM HTML5 CANVAS RENDERING
+     *************************************************************************/
+    function toggleCameraViewMode() {
+      cameraFollowMode = !cameraFollowMode;
+      updateCameraToggleUI();
+    }
+
+    function updateCameraToggleUI() {
+      const icon = document.getElementById('cameraToggleIcon');
+      const text = document.getElementById('cameraToggleText');
+      const btn = document.getElementById('cameraToggleBtn');
+
+      if (cameraFollowMode) {
+        icon.textContent = '🎯';
+        text.textContent = '타겟 추적 중';
+        btn.className = 'clay-pill bg-pink-100 hover:bg-pink-200 text-pink-800 px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1';
+      } else {
+        icon.textContent = '🗺️';
+        text.textContent = '수동/자유 시점';
+        btn.className = 'clay-pill bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1';
+      }
+    }
+
+    // Touch & Mouse Drag to manually scroll camera along the vertical course
+    function setupCanvasTouchDrag() {
+      const canvas = document.getElementById('rouletteCanvas');
+
+      const startDrag = (clientY) => {
+        isDraggingCamera = true;
+        dragStartY = clientY;
+        dragStartCameraY = cameraY;
+      };
+
+      const moveDrag = (clientY) => {
+        if (!isDraggingCamera) return;
+        const dy = (clientY - dragStartY) * 2.2;
+        if (Math.abs(dy) > 12 && cameraFollowMode) {
+          cameraFollowMode = false;
+          updateCameraToggleUI();
+        }
+        cameraY = Math.max(0, Math.min(WORLD_HEIGHT - VIEWPORT_HEIGHT, dragStartCameraY - dy));
+      };
+
+      const endDrag = () => {
+        isDraggingCamera = false;
+      };
+
+      canvas.addEventListener('mousedown', e => startDrag(e.clientY));
+      window.addEventListener('mousemove', e => moveDrag(e.clientY));
+      window.addEventListener('mouseup', endDrag);
+
+      canvas.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) startDrag(e.touches[0].clientY);
+      }, { passive: true });
+      canvas.addEventListener('touchmove', e => {
+        if (e.touches.length === 1) moveDrag(e.touches[0].clientY);
+      }, { passive: true });
+      canvas.addEventListener('touchend', endDrag);
+    }
+
+    // Main Animation & Render Loop
+    let lastFrameTime = performance.now();
+
+    function mainGameLoop(now) {
+      const rawDt = Math.min(32, now - lastFrameTime);
+      lastFrameTime = now;
+
+      const timeScale = slowMoActive ? 0.38 : 1.0;
+      const effectiveDelta = rawDt * timeScale;
+
+      if (engine) {
+        // Rotate Windmills & Star Gears
+        rotatingObstacles.forEach(wm => {
+          const dAngle = wm.baseSpeed * speedMultiplier * timeScale;
+          Body.setAngle(wm.body, wm.body.angle + dAngle);
+          Body.setAngularVelocity(wm.body, dAngle);
+        });
+
+        // Move Cloud Sliders
+        movingSliders.forEach(sl => {
+          const offset = Math.sin(now * sl.speed * speedMultiplier + sl.phase) * sl.rangeX;
+          const nextX = sl.originX + offset;
+          Body.setVelocity(sl.body, { x: nextX - sl.body.position.x, y: 0 });
+          Body.setPosition(sl.body, { x: nextX, y: sl.y });
+        });
+
+        // Step Physics Engine
+        Engine.update(engine, effectiveDelta);
+
+        // Update 40s Time-Attack & Anti-Stuck Logic
+        updateTimeAttackPhysics(rawDt / 1000);
+      }
+
+      // Smooth Camera Lerp
+      if (cameraFollowMode && targetMarble && !isDraggingCamera) {
+        const desiredY = targetMarble.body.position.y - VIEWPORT_HEIGHT * 0.42;
+        const clampedDesiredY = Math.max(0, Math.min(WORLD_HEIGHT - VIEWPORT_HEIGHT, desiredY));
+        cameraY += (clampedDesiredY - cameraY) * 0.09;
+      }
+
+      renderCanvas(now);
+      requestAnimationFrame(mainGameLoop);
+    }
+
+    function renderCanvas(now) {
+      const canvas = document.getElementById('rouletteCanvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // 1. Pastel Background Gradient & Subtle Polka Dot Grid
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#FFFDF9');
+      bgGrad.addColorStop(0.5, '#F8FAFC');
+      bgGrad.addColorStop(1, '#FFF5F8');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.save();
+      ctx.translate(0, -cameraY);
+
+      // Decorative depth grid dots
+      ctx.fillStyle = 'rgba(203, 213, 225, 0.38)';
+      const startGridY = Math.floor(cameraY / 80) * 80;
+      for (let gy = startGridY; gy < cameraY + H + 80; gy += 80) {
+        for (let gx = 60; gx < W; gx += 80) {
+          ctx.beginPath();
+          ctx.arc(gx, gy, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // 2. Slow-Motion Approach Zone Highlight (y: 1940 ~ 2210)
+      ctx.fillStyle = 'rgba(255, 209, 102, 0.11)';
+      ctx.fillRect(20, SLOW_MO_ZONE_Y, W - 40, FINISH_LINE_Y - SLOW_MO_ZONE_Y);
+      ctx.font = 'bold 13px "Jua", sans-serif';
+      ctx.fillStyle = '#D99B16';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚡ FINAL SLOW-MO ZONE ⚡', W / 2, SLOW_MO_ZONE_Y + 22);
+
+      // 3. Checkered Pastel Finish Line Banner (y = FINISH_LINE_Y)
+      const tileW = 24;
+      for (let x = 20; x < W - 20; x += tileW) {
+        const isEven = Math.floor(x / tileW) % 2 === 0;
+        ctx.fillStyle = isEven ? '#FF7EB6' : '#FFFFFF';
+        ctx.fillRect(x, FINISH_LINE_Y - 8, tileW, 8);
+        ctx.fillStyle = isEven ? '#FFFFFF' : '#4EA8DE';
+        ctx.fillRect(x, FINISH_LINE_Y, tileW, 8);
+      }
+      ctx.font = '18px "Jua", sans-serif';
+      ctx.fillStyle = '#DB2777';
+      ctx.fillText('🏁 FINISH LINE (결승선) 🏁', W / 2, FINISH_LINE_Y - 14);
+
+      // 4. Static Walls / Ramps
+      staticWalls.forEach(w => {
+        const pos = w.body.position;
+        if (pos.x < 0 || pos.x > W) return; // Skip invisible outer boundary blocks
+        ctx.save();
+        ctx.translate(pos.x, pos.y);
+        ctx.rotate(w.body.angle);
+        ctx.fillStyle = w.color;
+        ctx.strokeStyle = '#CBD5E1';
+        ctx.lineWidth = 2;
+        roundRect(ctx, -w.w / 2, -w.h / 2, w.w, w.h, 9);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // 5. Moving Cloud Sliders
+      movingSliders.forEach(sl => {
+        const pos = sl.body.position;
+        ctx.save();
+        ctx.translate(pos.x, pos.y);
+        ctx.fillStyle = sl.color;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 3;
+        roundRect(ctx, -sl.w / 2, -sl.h / 2, sl.w, sl.h, 11);
+        ctx.fill();
+        ctx.stroke();
+
+        // Cute eyes on cloud slider
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(-12, 0, 3.5, 0, Math.PI * 2);
+        ctx.arc(12, 0, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // 6. Rotating Windmills & Star Gears
+      rotatingObstacles.forEach(wm => {
+        ctx.save();
+        ctx.translate(wm.x, wm.y);
+        ctx.rotate(wm.body.angle);
+        for (let i = 0; i < wm.blades; i++) {
+          ctx.save();
+          ctx.rotate((Math.PI / wm.blades) * i);
+          ctx.fillStyle = wm.color;
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 2.5;
+          roundRect(ctx, -wm.armLength / 2, -wm.armWidth / 2, wm.armLength, wm.armWidth, 7);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+        // Center hub cap
+        ctx.beginPath();
+        ctx.arc(0, 0, 11, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = wm.color;
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // 7. Pastel Pegs
+      pegs.forEach(p => {
+        const isHit = now - p.hitTime < 180;
+        const r = isHit ? p.radius * 1.28 : p.radius;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.stroke();
+      });
+
+      // 8. Bouncy Jelly Bumpers
+      bumpers.forEach(b => {
+        if (b.hitScale > 1.0) {
+          b.hitScale = Math.max(1.0, b.hitScale - 0.03);
+        }
+        const r = b.radius * b.hitScale;
+        ctx.save();
+        ctx.translate(b.x, b.y);
+
+        // Outer soft ring
+        ctx.beginPath();
+        ctx.arc(0, 0, r + 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fill();
+
+        // Main jelly circle
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = b.color;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.stroke();
+
+        // Cute star/smile highlight inside bumper
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.font = 'bold 14px "Jua", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('★', 0, 1);
+        ctx.restore();
+      });
+
+      // 9. Collision Hit Ripples & Pop Particles
+      for (let i = hitRipples.length - 1; i >= 0; i--) {
+        const rp = hitRipples[i];
+        rp.r += 1.4;
+        rp.alpha -= 0.05;
+        if (rp.alpha <= 0) {
+          hitRipples.splice(i, 1);
+          continue;
+        }
+        ctx.beginPath();
+        ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+        ctx.strokeStyle = rp.color;
+        ctx.globalAlpha = rp.alpha;
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+      }
+
+      for (let i = popParticles.length - 1; i >= 0; i--) {
+        const pt = popParticles[i];
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.alpha -= 0.04;
+        if (pt.alpha <= 0) {
+          popParticles.splice(i, 1);
+          continue;
+        }
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2);
+        ctx.fillStyle = pt.color;
+        ctx.globalAlpha = pt.alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+      }
+
+      // 10. Glossy 3D Jelly Marbles + Motion Trails + Crisp Participant Names
+      marbles.forEach(m => {
+        const pos = m.body.position;
+        const r = m.radius;
+
+        // Motion trail
+        if (m.trail.length > 1 && !m.finished) {
+          for (let t = 0; t < m.trail.length; t++) {
+            const tp = m.trail[t];
+            const ratio = (t + 1) / m.trail.length;
+            ctx.beginPath();
+            ctx.arc(tp.x, tp.y, r * ratio * 0.65, 0, Math.PI * 2);
+            ctx.fillStyle = m.palette.light;
+            ctx.globalAlpha = ratio * 0.28;
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1.0;
+        }
+
+        // Target Marble Spotlight Halo
+        const isTarget = targetMarble && targetMarble.id === m.id && !m.finished;
+        if (isTarget) {
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, r + 7 + Math.sin(now * 0.01) * 2.5, 0, Math.PI * 2);
+          ctx.strokeStyle = winningMode === 'first' ? '#10B981' : '#F59E0B';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        }
+
+        // Jelly Ball Radial Gradient
+        const grad = ctx.createRadialGradient(
+          pos.x - r * 0.32,
+          pos.y - r * 0.32,
+          r * 0.1,
+          pos.x,
+          pos.y,
+          r
+        );
+        grad.addColorStop(0, m.palette.light);
+        grad.addColorStop(0.65, m.palette.main);
+        grad.addColorStop(1, m.palette.dark);
+
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Outer soft white rim
+        ctx.lineWidth = 1.8;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.stroke();
+
+        // Glossy Specular Highlight Circle (Capsule/Jelly Toy Look)
+        ctx.beginPath();
+        ctx.arc(pos.x - r * 0.34, pos.y - r * 0.34, r * 0.28, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+        ctx.fill();
+
+        // Participant Name Label Above Marble
+        ctx.font = '13px "Jua", "Pretendard", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        const labelY = pos.y - r - 3;
+
+        ctx.lineWidth = 3.5;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.strokeText(m.name, pos.x, labelY);
+
+        ctx.fillStyle = isTarget ? '#BE185D' : '#1E293B';
+        ctx.fillText(m.name, pos.x, labelY);
+      });
+
+      ctx.restore();
+
+      // 11. Right-Side Mini Vertical Course Progress Bar (HUD)
+      drawMiniProgressBar(ctx, W, H);
+    }
+
+    function drawMiniProgressBar(ctx, W, H) {
+      const barX = W - 18;
+      const barTop = 24;
+      const barHeight = H - 48;
+
+      // Track background
+      ctx.fillStyle = 'rgba(226, 232, 240, 0.75)';
+      roundRect(ctx, barX - 4, barTop, 8, barHeight, 4);
+      ctx.fill();
+
+      // Camera viewport window indicator
+      const camRatioTop = (cameraY / WORLD_HEIGHT) * barHeight;
+      const camRatioH = (VIEWPORT_HEIGHT / WORLD_HEIGHT) * barHeight;
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
+      roundRect(ctx, barX - 6, barTop + camRatioTop, 12, camRatioH, 4);
+      ctx.fill();
+
+      // Finish line tick on mini bar
+      const finishY = barTop + (FINISH_LINE_Y / WORLD_HEIGHT) * barHeight;
+      ctx.fillStyle = '#EC4899';
+      ctx.fillRect(barX - 7, finishY, 14, 3);
+
+      // Marble dots on mini bar
+      marbles.forEach(m => {
+        const my = barTop + Math.min(1, Math.max(0, m.body.position.y / WORLD_HEIGHT)) * barHeight;
+        const isTarget = targetMarble && targetMarble.id === m.id;
+        ctx.beginPath();
+        ctx.arc(barX, my, isTarget ? 4.5 : 2.8, 0, Math.PI * 2);
+        ctx.fillStyle = m.palette.main;
+        ctx.fill();
+        if (isTarget) {
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = '#1E293B';
+          ctx.stroke();
+        }
+      });
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    /*************************************************************************
+     * 7. INITIALIZATION ON WINDOW LOAD
+     *************************************************************************/
+    window.onload = function () {
+      loadStateFromUrlParams();
+      setupCanvasTouchDrag();
+      setupPhysicsWorld(true);
+      requestAnimationFrame(mainGameLoop);
+    };
+  </script>
+</body>
+</html>
